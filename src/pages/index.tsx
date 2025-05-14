@@ -1,115 +1,241 @@
-import Image from "next/image";
-import { Geist, Geist_Mono } from "next/font/google";
+import { useEffect, useRef, useState } from "react";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
+declare global {
+  interface Window {
+    VANTA: any;
+    THREE: any;
+  }
+}
 
 export default function Home() {
+  const vantaRef = useRef(null);
+  const [vantaEffect, setVantaEffect] = useState<any>(null);
+
+  useEffect(() => {
+    const loadScript = (src: string): Promise<void> => {
+      return new Promise((resolve, reject) => {
+        const script = document.createElement("script");
+        script.src = src;
+        script.async = true;
+        script.onload = () => resolve();
+        script.onerror = () => reject(new Error(`Failed to load ${src}`));
+        document.body.appendChild(script);
+      });
+    };
+
+    const loadVanta = async () => {
+      try {
+        await loadScript("/scripts/three.r134.min.js");
+        await loadScript("/scripts/vanta.net.min.js");
+
+        if (!vantaEffect && window.VANTA?.NET) {
+          const effect = window.VANTA.NET({
+            el: vantaRef.current,
+            mouseControls: true,
+            touchControls: true,
+            gyroControls: false,
+            minHeight: 200.0,
+            minWidth: 200.0,
+            scale: 1.0,
+            scaleMobile: 1.0,
+            color: 0xff5000,
+            backgroundColor: 0x1c1f21,
+            points: 20.0,
+            maxDistance: 26.0,
+            spacing: 20.0,
+            showDots: false,
+          });
+          setVantaEffect(effect);
+        }
+      } catch (error) {
+        console.error("Vanta load error:", error);
+      }
+    };
+
+    loadVanta();
+
+    return () => {
+      if (vantaEffect) vantaEffect.destroy();
+    };
+  }, [vantaEffect]);
+
   return (
-    <div
-      className={`${geistSans.className} ${geistMono.className} grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]`}
-    >
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm/6 text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-[family-name:var(--font-geist-mono)] font-semibold">
-              src/pages/index.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
-        </div>
+    <div className="relative text-orange-500 font-sans">
+      {/* Vanta Background (behind everything) */}
+      <div ref={vantaRef} className="fixed inset-0 -z-10 w-full h-full" />
+
+      {/* Sidebar */}
+      <aside className="fixed top-50 left-0 h-75 w-48 bg-black-800/60 backdrop-blur-md px-6 py-10 rounded-r-2xl flex flex-col justify-center items-center gap-6 text-lg z-10">
+        <a href="#home" className="text-[#FF5000] hover:underline">
+          home
+        </a>
+        <a href="#about" className="text-[#FF5000] hover:underline">
+          about
+        </a>
+        <a href="#projects" className="text-[#FF5000] hover:underline">
+          projects
+        </a>
+        <a href="#contact" className="text-[#FF5000] hover:underline">
+          contact
+        </a>
+      </aside>
+
+      {/* Main Content */}
+      <main className=" px-10 space-y-48">
+        <section
+          id="home"
+          className="min-h-screen flex items-center justify-center"
+        >
+          <div className="text-center">
+            <h1 className="text-6xl md:text-7xl font-bold text-white">
+              win cutrer
+            </h1>
+            <h2 className="text-3xl md:text-4xl mt-4 text-[#FF5000]">
+              fullstack developer
+            </h2>
+          </div>
+        </section>
+
+        <section
+          id="about"
+          className="ml-48 min-h-screen flex items-center justify-start"
+        >
+          <div className="max-w-3xl text-left text-white text-lg leading-relaxed">
+            <h2 className="text-4xl font-semibold">about</h2>
+            <p className="mt-4 text-white">
+              I'm Win Cutrer — a technical support and solutions professional
+              actively transitioning into a fullstack software engineering role.
+              With nearly a decade of experience in the tech industry, I’ve
+              built a reputation for solving complex problems, translating
+              between technical and non-technical teams, and advocating for user
+              needs with empathy and clarity.
+            </p>
+            <br />
+            <p>
+              While supporting customers and collaborating closely with product
+              and engineering teams, I found myself increasingly drawn to
+              building the solutions myself — not just escalating bugs, but
+              understanding how the systems work under the hood. That curiosity
+              led me to dive deep into fullstack development, where I’ve been
+              learning JavaScript, TypeScript, React, Node.js, and modern
+              backend architecture through project-based work.
+            </p>
+            <br />
+            <p>
+              What sets me apart is the combination of real-world technical
+              experience, strong communication skills, and a relentless drive to
+              learn. I don’t just want to write code — I want to build tools
+              that are intuitive, helpful, and genuinely improve the user
+              experience.
+            </p>
+            <p>
+              I'm now looking for a team where I can grow as a software
+              engineer, contribute from day one, and continue sharpening my
+              skills in a collaborative, fast-moving environment.
+            </p>
+          </div>
+        </section>
+
+        <section
+          id="projects"
+          className="min-h-screen flex items-center justify-end"
+        >
+          <div className="max-w-3xl text-white text-lg leading-relaxed space-y-8">
+            <h2 className="text-4xl font-semibold text-left">projects</h2>
+
+            <div className="space-y-6">
+              <div>
+                <h3 className="text-2xl font-bold text-white text-left">
+                  Weather App
+                </h3>
+                <p className="mt-2 text-left">
+                  A clean, responsive app that fetches live weather data from an
+                  external API. Built with React, styled with Tailwind, and
+                  deployed on Vercel. I implemented error handling, location
+                  search, and dynamic theming based on weather conditions.
+                </p>
+                <p className="mt-1 text-left">
+                  <a
+                    href="https://github.com/your-username/weather-app"
+                    className="underline hover:text-[#FF5000]"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    GitHub Repo
+                  </a>
+                  {" | "}
+                  <a
+                    href="https://your-weather-app.vercel.app"
+                    className="underline hover:text-[#FF5000]"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    Live Demo
+                  </a>
+                </p>
+              </div>
+
+              <br />
+
+              <div>
+                <h3 className="text-2xl font-bold text-white text-left">
+                  Wine Pairing App
+                </h3>
+                <p className="mt-2 text-left">
+                  A fullstack app that helps users find wine pairings based on
+                  the food they’re eating. Built with Next.js and integrated
+                  with a pairing API. It features server-side rendering and
+                  clean UX. I’m currently expanding it with user authentication
+                  and favorites.
+                </p>
+                <p className="mt-1 text-left">
+                  <a
+                    href="https://github.com/your-username/wine-app"
+                    className="underline hover:text-[#FF5000]"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    GitHub Repo
+                  </a>
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section
+          id="contact"
+          className="ml-48 min-h-screen flex items-center justify-start"
+        >
+          <div className="max-w-3xl text-left text-white text-lg leading-relaxed space-y-6">
+            <h2 className="text-4xl font-semibold">contact</h2>
+            <p>
+              I'm currently open to full-time software engineering
+              opportunities. If you're hiring or think I'd be a good fit for
+              your team, I'd love to hear from you.
+            </p>
+            <p>
+              The best way to reach me is by email at{" "}
+              <a
+                href="mailto:email-here"
+                className="underline text-[#FF5000] hover:text-white"
+              >
+                email here
+              </a>
+              <br />
+              You can also connect with me on <span> </span>
+              <a
+                href="https://www.linkedin.com/in/profile/"
+                className="underline text-[#FF5000] hover:text-white"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                LinkedIn
+              </a>
+            </p>
+          </div>
+        </section>
       </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
     </div>
   );
 }
